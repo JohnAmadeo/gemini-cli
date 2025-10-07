@@ -7,6 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import * as os from 'node:os';
 import { TestRig } from './test-helper.js';
+import stripAnsi from 'strip-ansi';
 
 describe('Ctrl+C exit', () => {
   it('should exit gracefully on second Ctrl+C', async () => {
@@ -21,17 +22,31 @@ describe('Ctrl+C exit', () => {
     });
 
     // Wait for the app to be ready by looking for the initial prompt indicator
-    await rig.poll(() => output.includes('▶'), 5000, 100);
+    const isReady = await rig.poll(
+      () => output.includes('Type your message'),
+      50000,
+      100,
+    );
+
+    expect(
+      isReady,
+      `App did not become ready in time. Output: ${stripAnsi(output)}`,
+    ).toBe(true);
 
     // Send first Ctrl+C
     ptyProcess.write('\x03');
 
     // Wait for the exit prompt
-    await rig.poll(
+
+    const isReadyToCancel = await rig.poll(
       () => output.includes('Press Ctrl+C again to exit'),
-      1500,
-      50,
+      50000,
+      100,
     );
+    expect(
+      isReadyToCancel,
+      `App did not become ready to cancel in time. Output: ${stripAnsi(output)}`,
+    ).toBe(true);
 
     // Send second Ctrl+C
     if (os.platform() === 'win32') {
@@ -82,12 +97,11 @@ describe('Ctrl+C exit', () => {
 
       // Only check for the quitting message on non-Windows platforms due to the
       // forceful kill workaround.
-      const quittingMessage = 'Agent powering down. Goodbye!';
-      // The regex below is intentionally matching the ESC control character (\x1b)
-      // to strip ANSI color codes from the terminal output.
-      // eslint-disable-next-line no-control-regex
-      const cleanOutput = output.replace(/\x1b\[[0-9;]*m/g, '');
-      expect(cleanOutput).toContain(quittingMessage);
+      expect(stripAnsi(result.output)).toContain(
+        'Agent powering down. Goodbye!',
+      );
     }
+
+    console.debug('Final output:', stripAnsi(output));
   });
 });

@@ -23,13 +23,16 @@ export class AgentRegistry {
    * Discovers and loads agents.
    */
   async initialize(): Promise<void> {
+    console.debug('[DEBUG] AgentRegsitry initialize');
     this.loadBuiltInAgents();
+    console.debug('[DEBUG] AgentRegsitry initialize 2');
 
     if (this.config.getDebugMode()) {
       console.log(
         `[AgentRegistry] Initialized with ${this.agents.size} agents.`,
       );
     }
+    console.debug('[DEBUG] AgentRegsitry initialize 8');
   }
 
   private loadBuiltInAgents(): void {
@@ -56,7 +59,9 @@ export class AgentRegistry {
       console.log(`[AgentRegistry] Overriding agent '${definition.name}'`);
     }
 
+    console.debug('[DEBUG] AgentRegsitry initialize 6');
     this.agents.set(definition.name, definition);
+    console.debug('[DEBUG] AgentRegsitry initialize 7');
   }
 
   /**

@@ -478,19 +478,28 @@ export class Config {
     }
     this.initialized = true;
 
+    console.debug('[DEBUG] initialize 1');
     // Initialize centralized FileDiscoveryService
     this.getFileService();
+    console.debug('[DEBUG] initialize 2');
     if (this.getCheckpointingEnabled()) {
       await this.getGitService();
     }
+    process.stderr.write('[DEBUG] initialize 3\n');
     this.promptRegistry = new PromptRegistry();
 
+    console.debug('[DEBUG] initialize 4');
     this.agentRegistry = new AgentRegistry(this);
+    console.debug('[DEBUG] initialize 5.0');
     await this.agentRegistry.initialize();
 
+    console.debug('[DEBUG] initialize 5.1');
+    console.debug('[DEBUG] initialize 5.2');
     this.toolRegistry = await this.createToolRegistry();
 
+    console.debug('[DEBUG] initialize 6');
     await this.geminiClient.initialize();
+    console.debug('[DEBUG] initialize 7');
   }
 
   getContentGenerator(): ContentGenerator {

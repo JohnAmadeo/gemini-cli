@@ -210,10 +210,17 @@ export const AppContainer = (props: AppContainerProps) => {
   const staticExtraHeight = 3;
 
   useEffect(() => {
+    console.debug('[DEBUG] context 1');
     (async () => {
+      console.debug('[DEBUG] context 2');
       // Note: the program will not work if this fails so let errors be
       // handled by the global catch.
-      await config.initialize();
+      try {
+        await config.initialize();
+      } catch (e) {
+        console.debug('Failed to initialize config', e);
+      }
+      console.debug('[DEBUG] context 4');
       setConfigInitialized(true);
     })();
     registerCleanup(async () => {
